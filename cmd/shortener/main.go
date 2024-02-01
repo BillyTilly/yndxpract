@@ -12,14 +12,8 @@ var a = make(map[string]string)
 
 func handle(w http.ResponseWriter, r *http.Request) {
 	if r.Method == http.MethodPost {
-		n := r.Header.Get("Content-type")
+
 		body, _ := io.ReadAll(r.Body)
-
-		if "text/plain" != n {
-			w.WriteHeader(http.StatusBadRequest)
-			return
-		}
-
 		key := generateKey()
 		a[key] = string(body)
 
