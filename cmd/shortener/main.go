@@ -9,36 +9,43 @@ import (
 var host = "localhost:8080"
 
 var a = make(map[string]string)
+var generatedUrl string
 
 func handle(w http.ResponseWriter, r *http.Request) {
 	if r.Method == http.MethodPost {
-
-		body, _ := io.ReadAll(r.Body)
-		key := generateKey()
-		a[key] = string(body)
-
-		answer := "http://localhost:8080/" + key
-
-		w.Header().Set("Content-type", "text/plain")
-		w.WriteHeader(http.StatusCreated)
-		w.Write([]byte(answer))
-
+		generateUrlHandler(w, r)
 		return
 	} else {
-		key := r.URL.Path[len("/"):]
-		if key == "" {
-			w.WriteHeader(http.StatusBadRequest)
-			return
-		}
+		redirectHandler(w, r)
+	}
+}
 
-		res, ok := a[key]
-		if ok {
-			w.Header().Set("Location", res)
-			w.WriteHeader(http.StatusTemporaryRedirect)
-		} else {
-			w.WriteHeader(http.StatusBadRequest)
-		}
+func generateUrlHandler(w http.ResponseWriter, r *http.Request) {
+	body, _ := io.ReadAll(r.Body)
+	key := generateKey()
+	a[key] = string(body)
+	generatedUrl = key
 
+	answer := "http://localhost:8080/" + key
+
+	w.Header().Set("Content-type", "text/plain")
+	w.WriteHeader(http.StatusCreated)
+	w.Write([]byte(answer))
+}
+
+func redirectHandler(w http.ResponseWriter, r *http.Request) {
+	key := r.URL.Path[len("/"):]
+	if key == "" {
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	res, ok := a[key]
+	if ok {
+		w.Header().Set("Location", res)
+		w.WriteHeader(http.StatusTemporaryRedirect)
+	} else {
+		w.WriteHeader(http.StatusBadRequest)
 	}
 }
 
