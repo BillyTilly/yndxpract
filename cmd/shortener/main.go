@@ -9,22 +9,22 @@ import (
 var host = "localhost:8080"
 
 var a = make(map[string]string)
-var generatedUrl string
+var generatedURL string
 
 func handle(w http.ResponseWriter, r *http.Request) {
 	if r.Method == http.MethodPost {
-		generateUrlHandler(w, r)
+		generateURLHandler(w, r)
 		return
 	} else {
 		redirectHandler(w, r)
 	}
 }
 
-func generateUrlHandler(w http.ResponseWriter, r *http.Request) {
+func generateURLHandler(w http.ResponseWriter, r *http.Request) {
 	body, _ := io.ReadAll(r.Body)
 	key := generateKey()
 	a[key] = string(body)
-	generatedUrl = key
+	generatedURL = key
 
 	answer := "http://localhost:8080/" + key
 

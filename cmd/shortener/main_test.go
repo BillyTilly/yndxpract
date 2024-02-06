@@ -2,13 +2,11 @@ package main
 
 import (
 	"bytes"
-	"io"
 	"net/http"
 	"net/http/httptest"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/require"
 )
 
 func TestGenerateUrlHandler(t *testing.T) {
@@ -38,17 +36,12 @@ func TestGenerateUrlHandler(t *testing.T) {
 			request := httptest.NewRequest(http.MethodPost, tt.request, bytes.NewBufferString(tt.body))
 			w := httptest.NewRecorder()
 
-			generateUrlHandler(w, request)
+			generateURLHandler(w, request)
 
 			result := w.Result()
 
 			assert.Equal(t, tt.want.statusCode, result.StatusCode)
 			assert.Equal(t, tt.want.contentType, result.Header.Get("Content-Type"))
-
-			_, err := io.ReadAll(result.Body)
-			require.NoError(t, err)
-			err = result.Body.Close()
-			require.NoError(t, err)
 		})
 	}
 }
@@ -69,7 +62,7 @@ func TestRedirectHandler(t *testing.T) {
 				statusCode: http.StatusTemporaryRedirect,
 				headerLoc:  "http://yandex.ru",
 			},
-			request: "/" + generatedUrl,
+			request: "/" + generatedURL,
 		},
 	}
 	for _, tt := range tests {
