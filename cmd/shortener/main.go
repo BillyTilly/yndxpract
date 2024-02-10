@@ -4,6 +4,8 @@ import (
 	"io"
 	"math/rand"
 	"net/http"
+
+	"github.com/gin-gonic/gin"
 )
 
 var host = "localhost:8080"
@@ -11,41 +13,32 @@ var host = "localhost:8080"
 var a = make(map[string]string)
 var generatedURL string
 
-func handle(w http.ResponseWriter, r *http.Request) {
-	if r.Method == http.MethodPost {
-		generateURLHandler(w, r)
-		return
-	} else {
-		redirectHandler(w, r)
-	}
-}
-
-func generateURLHandler(w http.ResponseWriter, r *http.Request) {
-	body, _ := io.ReadAll(r.Body)
+func generateURLHandler(c *gin.Context) {
+	body, _ := io.ReadAll(c.Request.Body)
 	key := generateKey()
 	a[key] = string(body)
 	generatedURL = key
 
 	answer := "http://localhost:8080/" + key
 
-	w.Header().Set("Content-type", "text/plain")
-	w.WriteHeader(http.StatusCreated)
-	w.Write([]byte(answer))
+	c.Writer.Header().Set("Content-type", "text/plain")
+	c.Writer.WriteHeader(http.StatusCreated)
+	c.Writer.Write([]byte(answer))
 }
 
-func redirectHandler(w http.ResponseWriter, r *http.Request) {
-	key := r.URL.Path[len("/"):]
+func redirectHandler(c *gin.Context) {
+	key := c.Request.URL.Path[len("/"):]
 	if key == "" {
-		w.WriteHeader(http.StatusBadRequest)
+		c.Writer.WriteHeader(http.StatusBadRequest)
 		return
 	}
 
 	res, ok := a[key]
 	if ok {
-		w.Header().Set("Location", res)
-		w.WriteHeader(http.StatusTemporaryRedirect)
+		c.Writer.Header().Set("Location", res)
+		c.Writer.WriteHeader(http.StatusTemporaryRedirect)
 	} else {
-		w.WriteHeader(http.StatusBadRequest)
+		c.Writer.WriteHeader(http.StatusBadRequest)
 	}
 }
 
@@ -61,8 +54,9 @@ func generateKey() string {
 }
 
 func main() {
-	err := http.ListenAndServe(host, http.HandlerFunc(handle))
-	if err != nil {
-		panic(err)
-	}
+	r := gin.New()
+	r.POST("/", generateURLHandler)
+	// r.GET("/", redirectHandler)
+
+	r.Run(host)
 }
