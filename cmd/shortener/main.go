@@ -56,7 +56,7 @@ func generateKey() string {
 func main() {
 	r := gin.New()
 	r.POST("/", generateURLHandler)
-	r.GET("/", redirectHandler)
+	r.GET("/:key", redirectHandler)
 
 	r.Run(host)
 }
