@@ -1,14 +1,14 @@
 package main
 
 import (
+	"flag"
 	"io"
 	"math/rand"
 	"net/http"
 
+	"github.com/BillyTilly/yndxpract/config"
 	"github.com/gin-gonic/gin"
 )
-
-var host = "localhost:8080"
 
 var a = make(map[string]string)
 var generatedURL string
@@ -19,7 +19,7 @@ func generateURLHandler(c *gin.Context) {
 	a[key] = string(body)
 	generatedURL = key
 
-	answer := "http://localhost:8080/" + key
+	answer := config.AppConfig.Host + "/" + key
 
 	c.Writer.Header().Set("Content-type", "text/plain")
 	c.Writer.WriteHeader(http.StatusCreated)
@@ -54,9 +54,22 @@ func generateKey() string {
 }
 
 func main() {
+	var host string
+	var resultHost string
+
+	flag.StringVar(&host, "a", "localhost:8080", "host")
+
+	flag.Parse()
+
+	flag.StringVar(&resultHost, "b", "http://"+host, "resulted host")
+
+	flag.Parse()
+
+	config.GenerateConfig(host, resultHost)
+
 	r := gin.New()
 	r.POST("/", generateURLHandler)
 	r.GET("/:key", redirectHandler)
 
-	r.Run(host)
+	r.Run(config.AppConfig.Host)
 }
