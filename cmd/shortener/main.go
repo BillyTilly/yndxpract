@@ -18,7 +18,7 @@ func generateURLHandler(c *gin.Context) {
 	a[key] = string(body)
 	generatedURL = key
 
-	answer := config.AppConfig.BaseUrl + "/" + key
+	answer := config.AppConfig.BaseURL + "/" + key
 
 	c.Writer.Header().Set("Content-type", "text/plain")
 	c.Writer.WriteHeader(http.StatusCreated)
