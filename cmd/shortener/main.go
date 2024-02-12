@@ -1,7 +1,6 @@
 package main
 
 import (
-	"flag"
 	"io"
 	"math/rand"
 	"net/http"
@@ -19,7 +18,7 @@ func generateURLHandler(c *gin.Context) {
 	a[key] = string(body)
 	generatedURL = key
 
-	answer := config.AppConfig.RedirectAd + "/" + key
+	answer := config.AppConfig.BaseUrl + "/" + key
 
 	c.Writer.Header().Set("Content-type", "text/plain")
 	c.Writer.WriteHeader(http.StatusCreated)
@@ -54,19 +53,7 @@ func generateKey() string {
 }
 
 func main() {
-	var host string
-	var resultHost string
-
-	flag.StringVar(&host, "a", "localhost:8080", "host")
-	flag.StringVar(&resultHost, "b", "http://localhost:8080", "resulted host")
-
-	flag.Parse()
-
-	if string(host) != "localhost:8080" {
-		resultHost = "http://" + host
-	}
-
-	config.GenerateConfig(host, resultHost)
+	config.GenerateConfig()
 
 	r := gin.New()
 	r.POST("/", generateURLHandler)
