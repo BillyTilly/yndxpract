@@ -10,15 +10,15 @@ var AppConfig mainConfig
 
 type mainConfig struct {
 	Host    string `env:"SERVER_ADDRESS"`
-	BaseUrl string `env:"BASE_URL"`
+	BaseURL string `env:"BASE_URL"`
 }
 
 func GenerateConfig() {
 	var host string
-	var baseUrl string
+	var baseURL string
 
 	flag.StringVar(&host, "a", "localhost:8080", "host")
-	flag.StringVar(&baseUrl, "b", "http://localhost:8080", "resulted host")
+	flag.StringVar(&baseURL, "b", "http://localhost:8080", "resulted host")
 
 	flag.Parse()
 
@@ -29,11 +29,11 @@ func GenerateConfig() {
 	}
 
 	if string(AppConfig.Host) != "localhost:8080" {
-		AppConfig.BaseUrl = "http://" + host
+		AppConfig.BaseURL = "http://" + host
 		return
 	}
 
-	if AppConfig.BaseUrl == "" {
-		AppConfig.BaseUrl = baseUrl
+	if AppConfig.BaseURL == "" {
+		AppConfig.BaseURL = baseURL
 	}
 }
