@@ -19,7 +19,7 @@ func generateURLHandler(c *gin.Context) {
 	a[key] = string(body)
 	generatedURL = key
 
-	answer := "http://" + config.AppConfig.RedirectAd + "/" + key
+	answer := config.AppConfig.RedirectAd + "/" + key
 
 	c.Writer.Header().Set("Content-type", "text/plain")
 	c.Writer.WriteHeader(http.StatusCreated)
@@ -58,12 +58,13 @@ func main() {
 	var resultHost string
 
 	flag.StringVar(&host, "a", "localhost:8080", "host")
+	flag.StringVar(&resultHost, "b", "http://localhost:8080", "resulted host")
 
 	flag.Parse()
 
-	flag.StringVar(&resultHost, "b", host, "resulted host")
-
-	flag.Parse()
+	if string(host) != "localhost:8080" {
+		resultHost = "http://" + host
+	}
 
 	config.GenerateConfig(host, resultHost)
 
