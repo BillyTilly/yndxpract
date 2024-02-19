@@ -18,14 +18,16 @@ func TestGenerateUrlHandler(t *testing.T) {
 		statusCode  int
 	}
 	tests := []struct {
-		name    string
-		request string
-		body    string
-		want    want
+		name        string
+		request     string
+		body        string
+		contentType string
+		want        want
 	}{
 		{
-			name: "simple test #1",
-			body: "http://yandex.ru",
+			name:        "success test",
+			body:        "http://yandex.ru",
+			contentType: "text/plain; charset=utf-8",
 			want: want{
 				contentType: "text/plain",
 				statusCode:  http.StatusCreated,
@@ -33,8 +35,19 @@ func TestGenerateUrlHandler(t *testing.T) {
 			request: "/",
 		},
 		{
-			name: "simple test #1",
-			body: "",
+			name:        "wrong content type",
+			body:        "http://yandex.ru",
+			contentType: "application/json",
+			want: want{
+				contentType: "",
+				statusCode:  http.StatusBadRequest,
+			},
+			request: "/",
+		},
+		{
+			name:        "empty body",
+			body:        "",
+			contentType: "text/plain; charset=utf-8",
 			want: want{
 				contentType: "",
 				statusCode:  http.StatusBadRequest,
@@ -51,6 +64,8 @@ func TestGenerateUrlHandler(t *testing.T) {
 			c, _ := gin.CreateTestContext(w)
 
 			c.Request = request
+			c.Request.Header.Set("Content-type", tt.contentType)
+
 			generateURLHandler(c)
 
 			result := w.Result()
@@ -67,7 +82,7 @@ func TestGenerateUrlHandler(t *testing.T) {
 }
 
 func TestRedirectHandler(t *testing.T) {
-	generatedUrls["ViFL5L"] = "http://yandex.ru"
+	generatedURLs["ViFL5L"] = "http://yandex.ru"
 
 	type want struct {
 		statusCode int
