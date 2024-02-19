@@ -22,7 +22,7 @@ func generateURLHandler(c *gin.Context) {
 	key := generateKey()
 	stringedBody := string(body)
 
-	if "" == stringedBody {
+	if stringedBody == "" {
 		c.Writer.WriteHeader(http.StatusBadRequest)
 		return
 	}

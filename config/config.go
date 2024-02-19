@@ -18,6 +18,7 @@ func GetConfig() {
 	var baseURL string
 
 	flag.StringVar(&host, "a", "localhost:8080", "host")
+	flag.StringVar(&baseURL, "b", "http://localhost:8080", "resulted host")
 
 	flag.Parse()
 
@@ -27,9 +28,10 @@ func GetConfig() {
 		AppConfig.Host = host
 	}
 
-	flag.StringVar(&baseURL, "b", "http://"+AppConfig.Host, "resulted host")
-
-	flag.Parse()
+	if string(AppConfig.Host) != "localhost:8080" {
+		AppConfig.BaseURL = "http://" + host
+		return
+	}
 
 	if AppConfig.BaseURL == "" {
 		AppConfig.BaseURL = baseURL
