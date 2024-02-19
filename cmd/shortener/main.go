@@ -9,14 +9,17 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-var a = make(map[string]string)
-var generatedURL string
+var generatedUrls = make(map[string]string)
 
 func generateURLHandler(c *gin.Context) {
+	if c.Request.Header.Get("Content-type") != "text/plain; charset=utf-8" {
+		c.Writer.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
 	body, _ := io.ReadAll(c.Request.Body)
 	key := generateKey()
-	a[key] = string(body)
-	generatedURL = key
+	generatedUrls[key] = string(body)
 
 	answer := config.AppConfig.BaseURL + "/" + key
 
@@ -32,7 +35,7 @@ func redirectHandler(c *gin.Context) {
 		return
 	}
 
-	res, ok := a[key]
+	res, ok := generatedUrls[key]
 	if ok {
 		c.Writer.Header().Set("Location", res)
 		c.Writer.WriteHeader(http.StatusTemporaryRedirect)
@@ -53,7 +56,7 @@ func generateKey() string {
 }
 
 func main() {
-	config.GenerateConfig()
+	config.GetConfig()
 
 	r := gin.New()
 	r.POST("/", generateURLHandler)

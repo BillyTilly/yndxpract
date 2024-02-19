@@ -18,17 +18,29 @@ func TestGenerateUrlHandler(t *testing.T) {
 		statusCode  int
 	}
 	tests := []struct {
-		name    string
-		request string
-		body    string
-		want    want
+		name        string
+		request     string
+		body        string
+		contentType string
+		want        want
 	}{
 		{
-			name: "simple test #1",
-			body: "http://yandex.ru",
+			name:        "simple test #1",
+			body:        "http://yandex.ru",
+			contentType: "text/plain; charset=utf-8",
 			want: want{
 				contentType: "text/plain",
 				statusCode:  http.StatusCreated,
+			},
+			request: "/",
+		},
+		{
+			name:        "simple test #1",
+			body:        "http://yandex.ru",
+			contentType: "application/json",
+			want: want{
+				contentType: "",
+				statusCode:  http.StatusBadRequest,
 			},
 			request: "/",
 		},
@@ -42,6 +54,7 @@ func TestGenerateUrlHandler(t *testing.T) {
 			c, _ := gin.CreateTestContext(w)
 
 			c.Request = request
+			c.Request.Header.Set("Content-type", tt.contentType)
 
 			generateURLHandler(c)
 
@@ -59,22 +72,41 @@ func TestGenerateUrlHandler(t *testing.T) {
 }
 
 func TestRedirectHandler(t *testing.T) {
+	generatedUrls["ViFL5L"] = "http://yandex.ru"
+
 	type want struct {
 		statusCode int
 		headerLoc  string
 	}
+
 	tests := []struct {
 		name    string
 		request string
 		want    want
 	}{
 		{
-			name: "simple test #1",
+			name: "success test ",
 			want: want{
 				statusCode: http.StatusTemporaryRedirect,
 				headerLoc:  "http://yandex.ru",
 			},
-			request: "/" + generatedURL,
+			request: "/" + "ViFL5L",
+		},
+		{
+			name: "no key test",
+			want: want{
+				statusCode: http.StatusBadRequest,
+				headerLoc:  "",
+			},
+			request: "/",
+		},
+		{
+			name: "wrong key tyst",
+			want: want{
+				statusCode: http.StatusBadRequest,
+				headerLoc:  "",
+			},
+			request: "/" + "ViFL5V",
 		},
 	}
 	for _, tt := range tests {
