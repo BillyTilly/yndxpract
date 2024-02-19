@@ -18,16 +18,14 @@ func TestGenerateUrlHandler(t *testing.T) {
 		statusCode  int
 	}
 	tests := []struct {
-		name        string
-		request     string
-		body        string
-		contentType string
-		want        want
+		name    string
+		request string
+		body    string
+		want    want
 	}{
 		{
-			name:        "simple test #1",
-			body:        "http://yandex.ru",
-			contentType: "text/plain; charset=utf-8",
+			name: "simple test #1",
+			body: "http://yandex.ru",
 			want: want{
 				contentType: "text/plain",
 				statusCode:  http.StatusCreated,
@@ -35,9 +33,8 @@ func TestGenerateUrlHandler(t *testing.T) {
 			request: "/",
 		},
 		{
-			name:        "simple test #1",
-			body:        "http://yandex.ru",
-			contentType: "application/json",
+			name: "simple test #1",
+			body: "",
 			want: want{
 				contentType: "",
 				statusCode:  http.StatusBadRequest,
@@ -54,8 +51,6 @@ func TestGenerateUrlHandler(t *testing.T) {
 			c, _ := gin.CreateTestContext(w)
 
 			c.Request = request
-			c.Request.Header.Set("Content-type", tt.contentType)
-
 			generateURLHandler(c)
 
 			result := w.Result()

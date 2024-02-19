@@ -12,14 +12,16 @@ import (
 var generatedUrls = make(map[string]string)
 
 func generateURLHandler(c *gin.Context) {
-	if c.Request.Header.Get("Content-type") != "text/plain; charset=utf-8" {
+	body, _ := io.ReadAll(c.Request.Body)
+	key := generateKey()
+	stringedBody := string(body)
+
+	if "" == stringedBody {
 		c.Writer.WriteHeader(http.StatusBadRequest)
 		return
 	}
 
-	body, _ := io.ReadAll(c.Request.Body)
-	key := generateKey()
-	generatedUrls[key] = string(body)
+	generatedUrls[key] = stringedBody
 
 	answer := config.AppConfig.BaseURL + "/" + key
 
