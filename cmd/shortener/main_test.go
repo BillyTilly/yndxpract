@@ -82,7 +82,7 @@ func TestGenerateUrlHandler(t *testing.T) {
 }
 
 func TestRedirectHandler(t *testing.T) {
-	generatedURLs["ViFL5L"] = "http://yandex.ru"
+	generatedURLs = map[string]string{"ViFL5L": "http://yandex.ru"}
 
 	type want struct {
 		statusCode int
@@ -92,10 +92,12 @@ func TestRedirectHandler(t *testing.T) {
 	tests := []struct {
 		name    string
 		request string
+		key     string
 		want    want
 	}{
 		{
 			name: "success test ",
+			key:  "ViFL5L",
 			want: want{
 				statusCode: http.StatusTemporaryRedirect,
 				headerLoc:  "http://yandex.ru",
@@ -104,6 +106,7 @@ func TestRedirectHandler(t *testing.T) {
 		},
 		{
 			name: "no key test",
+			key:  "",
 			want: want{
 				statusCode: http.StatusBadRequest,
 				headerLoc:  "",
@@ -112,6 +115,7 @@ func TestRedirectHandler(t *testing.T) {
 		},
 		{
 			name: "wrong key tyst",
+			key:  "ViFL5V",
 			want: want{
 				statusCode: http.StatusBadRequest,
 				headerLoc:  "",
@@ -125,6 +129,7 @@ func TestRedirectHandler(t *testing.T) {
 			w := httptest.NewRecorder()
 
 			c, _ := gin.CreateTestContext(w)
+			c.Params = []gin.Param{{Key: "key", Value: tt.key}}
 
 			c.Request = request
 

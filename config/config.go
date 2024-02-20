@@ -14,26 +14,10 @@ type mainConfig struct {
 }
 
 func GetConfig() {
-	var host string
-	var baseURL string
-
-	flag.StringVar(&host, "a", "localhost:8080", "host")
-	flag.StringVar(&baseURL, "b", "http://localhost:8080", "resulted host")
+	flag.StringVar(&AppConfig.Host, "a", "localhost:8080", "host")
+	flag.StringVar(&AppConfig.BaseURL, "b", "http://localhost:8080", "resulted host")
 
 	flag.Parse()
 
 	env.Parse(&AppConfig)
-
-	if AppConfig.Host == "" {
-		AppConfig.Host = host
-	}
-
-	if string(AppConfig.Host) != "localhost:8080" {
-		AppConfig.BaseURL = "http://" + host
-		return
-	}
-
-	if AppConfig.BaseURL == "" {
-		AppConfig.BaseURL = baseURL
-	}
 }

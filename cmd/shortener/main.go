@@ -19,15 +19,14 @@ func generateURLHandler(c *gin.Context) {
 
 	body, _ := io.ReadAll(c.Request.Body)
 
-	key := generateKey()
-	stringedBody := string(body)
-
-	if stringedBody == "" {
+	if len(body) == 0 {
 		c.Writer.WriteHeader(http.StatusBadRequest)
 		return
 	}
 
-	generatedURLs[key] = stringedBody
+	key := generateKey()
+
+	generatedURLs[key] = string(body)
 
 	answer := config.AppConfig.BaseURL + "/" + key
 
@@ -37,7 +36,8 @@ func generateURLHandler(c *gin.Context) {
 }
 
 func redirectHandler(c *gin.Context) {
-	key := c.Request.URL.Path[len("/"):]
+	key := c.Param("key")
+
 	if key == "" {
 		c.Writer.WriteHeader(http.StatusBadRequest)
 		return
